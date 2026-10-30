@@ -1,0 +1,134 @@
+@import "tailwindcss";
+@import "@fontsource/atkinson-hyperlegible-next/400.css";
+@import "@fontsource/atkinson-hyperlegible-next/500.css";
+@import "@fontsource/atkinson-hyperlegible-next/700.css";
+@import "@fontsource-variable/source-serif-4/opsz.css";
+@import "@fontsource-variable/source-serif-4/opsz-italic.css";
+
+/*
+  Bildwort design tokens.
+  The grammar colours ARE the brand: every article and case keeps one colour
+  everywhere in the app (lessons, flashcards, AI answers, exams).
+*/
+@theme {
+  --font-sans: "Atkinson Hyperlegible Next", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Source Serif 4 Variable", Georgia, serif;
+
+  --color-paper: #fcfbf8;
+  --color-surface: #f3f1ec;
+  --color-line: #e3dfd6;
+  --color-ink: #1e2733;
+  --color-ink-soft: #5b6573;
+  --color-ink-faint: #8d95a1;
+
+  /* Articles */
+  --color-der: #2f6db5;
+  --color-der-soft: #e4eef9;
+  --color-die: #c23b5b;
+  --color-die-soft: #f9e4e9;
+  --color-das: #2a8a68;
+  --color-das-soft: #dff2ea;
+  --color-pl: #9a7a26;
+  --color-pl-soft: #f5edd6;
+
+  /* Cases */
+  --color-nom: #1e2733;
+  --color-nom-soft: #e8ebef;
+  --color-akk: #d4771a;
+  --color-akk-soft: #fcebd6;
+  --color-dat: #6d4fb0;
+  --color-dat-soft: #ece6f8;
+
+  /* Feedback */
+  --color-ok: #2f7d46;
+  --color-ok-soft: #e2f1e6;
+  --color-bad: #b42318;
+  --color-bad-soft: #fbe5e2;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-paper);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
+::selection {
+  background: var(--color-akk-soft);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-der);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* German text is always set in the serif — it reads like a printed textbook. */
+.de {
+  font-family: var(--font-serif);
+  font-optical-sizing: auto;
+}
+
+/* ---------- Motion with a teaching purpose ---------- */
+@keyframes dp-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes dp-pop {
+  0% { transform: scale(0.85); opacity: 0; }
+  60% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes dp-draw {
+  from { stroke-dashoffset: var(--len, 200); }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes dp-bite {
+  0%, 30% { clip-path: circle(100% at 50% 50%); }
+  100% { clip-path: circle(100% at 50% 50%); }
+}
+@keyframes dp-hand-to-mouth {
+  0%, 15% { transform: rotate(0deg); }
+  45%, 60% { transform: rotate(-38deg); }
+  90%, 100% { transform: rotate(0deg); }
+}
+@keyframes dp-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes dp-give {
+  0%, 10% { transform: translateX(0); }
+  55%, 100% { transform: translateX(var(--give-distance, 120px)); }
+}
+@keyframes dp-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.anim-rise { animation: dp-rise 0.45s ease-out both; }
+.anim-pop { animation: dp-pop 0.4s ease-out both; }
+.anim-draw { stroke-dasharray: var(--len, 200); animation: dp-draw 0.9s ease-out 0.2s both; }
+.anim-float { animation: dp-float 3.2s ease-in-out infinite; }
+.anim-shake { animation: dp-shake 0.3s ease-in-out 2; }
+.anim-eat-arm { transform-box: fill-box; transform-origin: 10% 10%; animation: dp-hand-to-mouth 3.6s ease-in-out infinite; }
+.anim-give { animation: dp-give 2.8s ease-in-out infinite alternate; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

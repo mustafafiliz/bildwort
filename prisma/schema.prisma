@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Anonymous learner, identified by an httpOnly cookie.
+model User {
+  id         String           @id @default(cuid())
+  createdAt  DateTime         @default(now())
+  level      String           @default("A1")
+  lessons    LessonProgress[]
+  cards      CardState[]
+  mistakes   Mistake[]
+  messages   TeacherMessage[]
+  exams      ExamResult[]
+}
+
+model LessonProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonSlug  String
+  step        Int      @default(0)
+  completed   Boolean  @default(false)
+  score       Int      @default(0)
+  total       Int      @default(0)
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonSlug])
+}
+
+/// Spaced-repetition state per word and direction (SM-2).
+model CardState {
+  id          String   @id @default(cuid())
+  userId      String
+  wordId      String
+  direction   String   // "de-tr" | "tr-de"
+  ease        Float    @default(2.5)
+  interval    Int      @default(0) // days
+  reps        Int      @default(0)
+  lapses      Int      @default(0)
+  due         DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, wordId, direction])
+  @@index([userId, due])
+}
+
+/// Every wrong answer, so lessons, review and the AI teacher can use them.
+model Mistake {
+  id         String   @id @default(cuid())
+  userId     String
+  source     String   // "lesson" | "exam" | "speaking" | "teacher" | "vocab"
+  topic      String   // e.g. "akkusativ", lesson slug
+  prompt     String
+  given      String
+  expected   String
+  note       String?
+  resolved   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, resolved])
+}
+
+model TeacherMessage {
+  id         String   @id @default(cuid())
+  userId     String
+  role       String   // "user" | "assistant"
+  content    String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model ExamResult {
+  id         String   @id @default(cuid())
+  userId     String
+  examId     String   // e.g. "goethe-a2"
+  section    String   // "lesen" | "hoeren" | "schreiben" | "sprechen"
+  taskId     String
+  score      Int
+  total      Int
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, examId])
+}
